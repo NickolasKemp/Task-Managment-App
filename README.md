@@ -16,6 +16,7 @@ Go to the project directories
 
 ```bash
   cd React-App/backend
+  
   cd React-App/frontend
 ```
 
