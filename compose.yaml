@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: 'db'
+    image: postgres:latest
+    restart: always
+    ports:
+      - "5435:5435"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    container_name: 'backend'
+    image: backend
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5435/postgres?schema=public
+    build:
+      args:
+        - DATABASE_URL=${DATABASE_URL}
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5000"
+
+  frontend:
+    container_name: 'frontend'
+    image: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    restart: always
+    environment:
+      - SERVER_URL=http://localhost:5001/api
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
